@@ -68,6 +68,8 @@ func (p *TextMapPropagator) Inject(
 	textMapWriter.Set("x-b3-spanid", p.encodeValue(strconv.FormatUint(sc.SpanID(), 16)))
 	if sc.IsSampled() {
 		textMapWriter.Set("x-b3-sampled", p.encodeValue("1"))
+	} else {
+		textMapWriter.Set("x-b3-sampled", p.encodeValue("0"))
 	}
 	return nil
 }
@@ -90,7 +92,7 @@ func (p *TextMapPropagator) Extract(abstractCarrier interface{}) (jaeger.SpanCon
 			parentID, err = strconv.ParseUint(p.decodeValue(value), 16, 64)
 		} else if key == "x-b3-spanid" {
 			spanID, err = strconv.ParseUint(p.decodeValue(value), 16, 64)
-		} else if key == "x-b3-sampled" {
+		} else if key == "x-b3-sampled" && value == "1" {
 			sampled = true
 		}
 		return err
