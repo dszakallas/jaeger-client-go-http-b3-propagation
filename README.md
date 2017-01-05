@@ -3,7 +3,7 @@ OpenZipkin B3 http header propagation for jaeger-client-go
 
 Adds support for reading Zipkin B3 Propagation HTTP headers
 
-```
+```go
 
 // ...
 
