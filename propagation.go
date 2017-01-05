@@ -34,27 +34,13 @@ type Extractor interface {
 	Extract(carrier interface{}) (jaeger.SpanContext, error)
 }
 
-type textMapPropagator struct {
-	tracer      *opentracing.Tracer
+type TextMapPropagator struct {
 	encodeValue func(string) string
 	decodeValue func(string) string
 }
 
-func newTextMapPropagator(tracer *opentracing.Tracer) *textMapPropagator {
-	return &textMapPropagator{
-		tracer: tracer,
-		encodeValue: func(val string) string {
-			return val
-		},
-		decodeValue: func(val string) string {
-			return val
-		},
-	}
-}
-
-func newHTTPHeaderPropagator(tracer *opentracing.Tracer) *textMapPropagator {
-	return &textMapPropagator{
-		tracer: tracer,
+func NewZipkinB3HTTPHeaderPropagator() *TextMapPropagator {
+	return &TextMapPropagator{
 		encodeValue: func(val string) string {
 			return url.QueryEscape(val)
 		},
@@ -68,7 +54,7 @@ func newHTTPHeaderPropagator(tracer *opentracing.Tracer) *textMapPropagator {
 	}
 }
 
-func (p *textMapPropagator) Inject(
+func (p *TextMapPropagator) Inject(
 	sc jaeger.SpanContext,
 	abstractCarrier interface{},
 ) error {
@@ -86,7 +72,7 @@ func (p *textMapPropagator) Inject(
 	return nil
 }
 
-func (p *textMapPropagator) Extract(abstractCarrier interface{}) (jaeger.SpanContext, error) {
+func (p *TextMapPropagator) Extract(abstractCarrier interface{}) (jaeger.SpanContext, error) {
 	textMapReader, ok := abstractCarrier.(opentracing.TextMapReader)
 	if !ok {
 		return jaeger.SpanContext{}, opentracing.ErrInvalidCarrier
